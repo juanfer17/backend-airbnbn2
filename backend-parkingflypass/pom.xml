@@ -13,6 +13,30 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend-parkingflypass</name>
 	<description>Parqueadero Flypass</description>
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<profile.dir>src/main/development</profile.dir>
+			</properties>
+		</profile>
+		<profile>
+			<id>cert</id>
+			<properties>
+				<profile.dir>src/main/cert</profile.dir>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<profile.dir>src/main/prod</profile.dir>
+			</properties>
+		</profile>
+	</profiles>
+
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -32,19 +56,23 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-core</artifactId>
+			<version>1.12.272</version>
+		</dependency>
+		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk</artifactId>
-			<version>1.11.1036</version> <!-- Usa la versión más reciente disponible -->
+			<version>1.12.272</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
-			<artifactId>amazon-sqs-java-messaging-lib</artifactId>
-			<version>1.0.12</version> <!-- Usa la versión más reciente disponible -->
-		</dependency>
-		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-dynamodb</artifactId>
-			<version>1.11.1036</version> <!-- Usa la versión más reciente disponible -->
+			<artifactId>aws-java-sdk-sns</artifactId>
+			<version>1.12.319</version>
 		</dependency>
 	</dependencies>
 
@@ -63,6 +91,17 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>${profile.dir}</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+		<finalName>parkingFlypassService</finalName>
 	</build>
 
 </project>

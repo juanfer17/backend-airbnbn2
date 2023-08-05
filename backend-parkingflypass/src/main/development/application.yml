@@ -1,0 +1,20 @@
+application:
+  config:
+    profile: dev_
+    url: 'http://192.168.1.16:9124/cityParkingService'
+aws:
+  accessKey: AKIAU25556XO3L7TL3VQ
+  secretKey: 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
+info:
+  component: parkingFlypassService
+server:
+  servlet:
+    context-path: "/parkingFlypassService"
+  port: 9126
+spring:
+  application:
+    name: parkingFlypassService
+  profiles:
+    active: dev
+endpoints:
+  enabled: false

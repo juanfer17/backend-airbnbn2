@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BackendParkingflypassApplication {
+public class ParkingFlypassApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BackendParkingflypassApplication.class, args);
+		SpringApplication.run(ParkingFlypassApplication.class, args);
 	}
 
 }
