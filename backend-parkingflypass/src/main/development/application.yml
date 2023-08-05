@@ -1,16 +1,17 @@
 application:
   config:
     profile: dev_
-    url: 'http://192.168.1.16:9124/cityParkingService'
+    url: 'http://192.168.1.16:9124/parkingFlypassService'
 aws:
   accessKey: AKIAU25556XO3L7TL3VQ
   secretKey: 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
+  arnentryparking: arn:aws:sns:us-east-1:332721419741:dev_parking_flypass
 info:
   component: parkingFlypassService
 server:
   servlet:
     context-path: "/parkingFlypassService"
-  port: 9126
+  port: 9124
 spring:
   application:
     name: parkingFlypassService
