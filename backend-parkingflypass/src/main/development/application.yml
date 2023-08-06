@@ -7,6 +7,8 @@ aws:
   secretKey: x2N8DeDaExg/QiLvuCx8tzmzhhNcS6yoC2JaZ4Xu
   arnentryparkingsns: 'arn:aws:sns:us-east-1:332721419741:dev_parking_flypass'
   arnentryparkingsqs: 'arn:aws:sqs:us-east-1:332721419741:dev_parking_flypass_entry'
+  arnexitparkingsns: 'arn:aws:sns:us-east-1:332721419741:dev_parking_flypass_exit'
+  arnexitparkingsqs: 'arn:aws:sqs:us-east-1:332721419741:dev_parking_flypass_exit'
 info:
   component: parkingFlypassService
 server:

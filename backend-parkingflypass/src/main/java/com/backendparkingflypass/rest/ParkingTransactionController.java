@@ -1,9 +1,8 @@
 package com.backendparkingflypass.rest;
 
 import com.backendparkingflypass.dto.RequestTransactionCreateDTO;
+import com.backendparkingflypass.dto.RequestTransactionTerminatedDTO;
 import com.backendparkingflypass.general.constansts.Constants;
-import com.backendparkingflypass.general.exception.NoDataFoundException;
-import com.backendparkingflypass.general.exception.ValidationException;
 import com.backendparkingflypass.service.TransactionService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,12 @@ public class ParkingTransactionController {
     @PostMapping( value = Constants.CREATE_TRANSACTIONS)
     public void createTransaction(@RequestBody List<RequestTransactionCreateDTO> requestTransactionCreate, @ApiIgnore HttpServletResponse response){
         transactionService.sendTransactionToSNS(requestTransactionCreate);
+        response.setStatus(HttpServletResponse.SC_CREATED);
+    }
+
+    @PostMapping( value = Constants.TERMINATED_TRANSACTIONS)
+    public void endTransaction(@RequestBody List<RequestTransactionTerminatedDTO> requestTransactionTerminated, @ApiIgnore HttpServletResponse response){
+        transactionService.sendEndTransactionToSNS(requestTransactionTerminated);
         response.setStatus(HttpServletResponse.SC_CREATED);
     }
 

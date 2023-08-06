@@ -17,7 +17,7 @@ public class ParkingTransaction extends Model{
     private Integer transactionStatus;
     private Date exitDate;
     private String vehicleType;
-    private String timeService;
+    private Integer timeService;
 
     @DynamoDBHashKey(attributeName = "transactionId")
     @ApiModelProperty(required = true)
@@ -70,10 +70,10 @@ public class ParkingTransaction extends Model{
     }
 
     @DynamoDBAttribute(attributeName = "timeService")
-    public String getTimeService() {
+    public Integer getTimeService() {
         return timeService;
     }
-    public void setTimeService(String timeService) {
+    public void setTimeService(Integer timeService) {
         this.timeService = timeService;
     }
 
@@ -83,6 +83,16 @@ public class ParkingTransaction extends Model{
         eav.put(":plate", new AttributeValue().withS(plate));
         eav.put(":status", new AttributeValue().withN(transactionStatus.toString()));
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withFilterExpression("plate = :plate AND transactionStatus = :status").withExpressionAttributeValues(eav);
+        List<ParkingTransaction> transactionList = scan(ParkingTransaction.class, scanExpression);
+        if(transactionList.isEmpty()) {
+            return null;
+        }
+        return transactionList.get(0);
+    }
+    public static ParkingTransaction findByTransaction(String transactionId) {
+        Map<String, AttributeValue> eav = new HashMap<>();
+        eav.put(":transactionId", new AttributeValue().withS(transactionId));
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withFilterExpression("transactionId = :transactionId").withExpressionAttributeValues(eav);
         List<ParkingTransaction> transactionList = scan(ParkingTransaction.class, scanExpression);
         if(transactionList.isEmpty()) {
             return null;

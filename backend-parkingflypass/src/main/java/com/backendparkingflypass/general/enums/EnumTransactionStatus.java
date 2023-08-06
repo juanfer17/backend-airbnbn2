@@ -5,7 +5,7 @@ import com.backendparkingflypass.dto.EnumDTO;
 public enum EnumTransactionStatus {
 
     STARTED(0, "Iniciada"),
-    PAID(1, "Transaccion PagadA");
+    TERMINATED(1, "Transaccion Finalizada");
 
     private final int id;
     private final String value;

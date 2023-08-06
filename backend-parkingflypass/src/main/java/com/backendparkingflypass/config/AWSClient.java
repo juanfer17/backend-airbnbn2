@@ -11,6 +11,9 @@ public class AWSClient {
     public static final String REGION = Regions.US_EAST_1.getName();
     public static String TRANSACTION_SNS_URL;
     public static String TRANSACTION_SQS_URL;
+
+    public static String TRANSACTION_EXIT_SNS_URL;
+    public static String TRANSACTION_EXIT_SQS_URL;
     private final AwsProperties awsProperties;
     private AWSStaticCredentialsProvider awsStaticCredentialsProvider;
 
@@ -18,6 +21,8 @@ public class AWSClient {
         this.awsProperties = awsProperties;
         TRANSACTION_SNS_URL = String.format("%s%s", applicationProperties.getProfile(), Constants.TRANSACTIONS_SNS);
         TRANSACTION_SQS_URL = String.format("%s%s", applicationProperties.getProfile(), Constants.TRANSACTIONS_SQS);
+        TRANSACTION_EXIT_SNS_URL = String.format("%s%s", applicationProperties.getProfile(), Constants.TRANSACTIONS_EXIT_SNS);
+        TRANSACTION_EXIT_SQS_URL = String.format("%s%s", applicationProperties.getProfile(), Constants.TRANSACTIONS_EXIT_SQS);
     }
 
     public AWSStaticCredentialsProvider getAWSCredentials() {
