@@ -16,8 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -50,12 +48,17 @@ public class TransactionService {
                 RequestTransactionCreateDTO requestTransactionCreate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionCreateDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
 
+                ParkingTransaction parkingTransactionIdValidation = TransactionIdValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class);
                 ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
-                if(parkingTransactionValidation == null){
-                    createAndSaveTransaction(requestTransactionCreate);
-                    logger.info("Se crea el Transaccion de la placa : " + requestTransactionCreate.getPlate() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());
-                } else {
-                    logger.warn("No se ha guardado el registro debido a que ya existe una transacción para la placa : " + requestTransactionCreate.getPlate()  + " que se encuentra en estado : " + requestTransactionCreate.getTransactionStatus() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());
+                if(parkingTransactionIdValidation == null){
+                    if(parkingTransactionValidation == null){
+                        createAndSaveTransaction(requestTransactionCreate);
+                        logger.info("Se crea el Transaccion de la placa : " + requestTransactionCreate.getPlate() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());
+                    } else {
+                        logger.warn("No se ha guardado el registro debido a que ya existe una transacción para la placa : " + requestTransactionCreate.getPlate()  + " que se encuentra en estado : " + requestTransactionCreate.getTransactionStatus() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());
+                    }
+                }else{
+                    logger.warn("No se ha guardado el registro debido a que ya existe la transacción : " + requestTransactionCreate.getTransactionId());
                 }
                 messagesToDelete.add(message);
             } catch (JsonProcessingException | NoSuchElementException | ClassCastException e) {
@@ -99,7 +102,7 @@ public class TransactionService {
                 RequestTransactionTerminatedDTO requestTransactionTerminate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionTerminatedDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
 
-                ParkingTransaction parkingTransactionValidation = terminateTransactionValidation(requestTransactionTerminate.getTransactionId(), ParkingTransaction.class);
+                ParkingTransaction parkingTransactionValidation = TransactionIdValidation(requestTransactionTerminate.getTransactionId(), ParkingTransaction.class);
                 if(parkingTransactionValidation != null){
                     terminateTransaction(parkingTransactionValidation);
                     logger.info("Se finaliza transaccion para la placa: " + parkingTransactionValidation.getPlate() + "con el numero de transacción : " + parkingTransactionValidation.getTransactionId());
@@ -114,7 +117,7 @@ public class TransactionService {
         return messagesToDelete;
     }
 
-    public <T> T terminateTransactionValidation(String transactionId,  Class<T> parkingTransactionDTOClass) {
+    public <T> T TransactionIdValidation(String transactionId,  Class<T> parkingTransactionDTOClass) {
         logger.info("Consulta de transacccion por id: {}" , transactionId);
         try{
             return Optional.ofNullable(ParkingTransaction.findByTransaction(transactionId)).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
