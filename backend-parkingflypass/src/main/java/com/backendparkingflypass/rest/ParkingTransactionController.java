@@ -41,4 +41,9 @@ public class ParkingTransactionController {
         return statisticsParking.averageTimeService(requestStatisticsParkingDTO);
     }
 
+    @PostMapping( value = Constants.MAX_SERVICE_TIME)
+    public String endTransaction(@ApiIgnore HttpServletResponse response){
+        return statisticsParking.maxTimeService();
+    }
+
 }

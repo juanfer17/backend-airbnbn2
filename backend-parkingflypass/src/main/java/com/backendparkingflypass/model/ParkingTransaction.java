@@ -106,7 +106,15 @@ public class ParkingTransaction extends Model{
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
                 .withFilterExpression("vehicleType = :vehicleType AND transactionStatus = :transactionStatus")
                 .withExpressionAttributeValues(eav);
+        return scan(ParkingTransaction.class, scanExpression);
+    }
 
+    public static List<ParkingTransaction> findByTransactionStatus(Integer transactionStatus) {
+        Map<String, AttributeValue> eav = new HashMap<>();
+        eav.put(":transactionStatus", new AttributeValue().withN(String.valueOf(transactionStatus)));
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression("transactionStatus = :transactionStatus")
+                .withExpressionAttributeValues(eav);
         return scan(ParkingTransaction.class, scanExpression);
     }
 

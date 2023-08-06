@@ -3,9 +3,9 @@ package com.backendparkingflypass.general.enums;
 import com.backendparkingflypass.dto.EnumDTO;
 
 public enum EnumVehicleType {
-    AUTOMOBILE(0, "Automovil"),
-    TRUCK(1, "Camión"),
-    MOTORCYCLE (2, "Motocicleta");
+    AUTOMOBILE(0, "AUTOMOVIL"),
+    TRUCK(1, "CAMION"),
+    MOTORCYCLE (2, "MOTOCICLETA");
 
     private final int id;
     private final String value;

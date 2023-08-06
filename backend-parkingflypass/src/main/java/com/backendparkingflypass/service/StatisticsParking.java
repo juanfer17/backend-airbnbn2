@@ -38,8 +38,6 @@ public class StatisticsParking {
         return "Tiempo promedio de servicio por tipo de vehículo: " + requestStatisticsParkingDTO.getVehicleType() + ": " + averageTime + " minutos";
     }
 
-
-
     public <T> List<T> findByVehicleType(String vehicleType, Class<T> parkingTransactionDTOClass) {
         logger.info("Consulta de transacciones por vehicleType: {}", vehicleType);
         List<ParkingTransaction> transactions = ParkingTransaction.findByVehicleTypeAndTransactionStatus(vehicleType, EnumTransactionStatus.TERMINATED.getId());
@@ -47,5 +45,42 @@ public class StatisticsParking {
                 .map(v -> v.getDTO(parkingTransactionDTOClass))
                 .collect(Collectors.toList());
     }
+
+    // Se busca el vehículo que ha permanecido más tiempo en el parqueadero.
+    public String maxTimeService() {
+        List<ParkingTransaction> timeServicesByTransactionStatus = findByTransactionStatus(EnumTransactionStatus.TERMINATED.getId(), ParkingTransaction.class);
+
+        if (timeServicesByTransactionStatus.isEmpty()) {
+            return "No hay información disponible para la consulta del vehículo que ha permanecido más tiempo en el parqueadero";
+        }
+
+        int maxTimeService = Integer.MIN_VALUE; // Inicializar con un valor muy pequeño
+        ParkingTransaction vehicleWithMaxTimeService = null;
+
+        for (ParkingTransaction transaction : timeServicesByTransactionStatus) {
+            int currentTimeService = transaction.getTimeService(); // Ajusta el nombre del método según tu clase ParkingTransaction
+
+            if (currentTimeService > maxTimeService) {
+                maxTimeService = currentTimeService;
+                vehicleWithMaxTimeService = transaction;
+            }
+        }
+
+        if (vehicleWithMaxTimeService != null) {
+            return "El vehículo con el tiempo de servicio máximo es " + vehicleWithMaxTimeService.getPlate() + " con un tiempo de servicio de " + maxTimeService + " minutos.";
+        } else {
+            return "No se pudo determinar el vehículo con el tiempo de servicio máximo.";
+        }
+    }
+
+
+    public <T> List<T> findByTransactionStatus(Integer transactionStatus, Class<T> parkingTransactionDTOClass) {
+        logger.info("Consulta de transacciones por transactionStatus: {}", transactionStatus);
+        List<ParkingTransaction> transactions = ParkingTransaction.findByTransactionStatus(transactionStatus);
+        return transactions.stream()
+                .map(v -> v.getDTO(parkingTransactionDTOClass))
+                .collect(Collectors.toList());
+    }
+
 
 }
