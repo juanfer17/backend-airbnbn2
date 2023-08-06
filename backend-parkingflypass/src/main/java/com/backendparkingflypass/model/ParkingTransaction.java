@@ -1,9 +1,12 @@
 package com.backendparkingflypass.model;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.*;
+
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import io.swagger.annotations.ApiModelProperty;
 
 @DynamoDBTable(tableName = "ParkingTransaction")
@@ -11,7 +14,7 @@ public class ParkingTransaction extends Model{
     private String transactionId;
     private Date entryDate;
     private String plate;
-    private String transactionStatus;
+    private Integer transactionStatus;
     private Date exitDate;
     private String vehicleType;
     private String timeService;
@@ -25,43 +28,48 @@ public class ParkingTransaction extends Model{
         this.transactionId = transactionId;
     }
 
-    @DynamoDBHashKey(attributeName = "entryDate")
+    @DynamoDBAttribute(attributeName = "entryDate")
     public Date getEntryDate() {
         return entryDate;
     }
     public void setEntryDate(Date entryDate) {
         this.entryDate = entryDate;
     }
-    @DynamoDBHashKey(attributeName = "plate")
+
+    @DynamoDBAttribute(attributeName = "plate")
     public String getPlate() {
         return plate;
     }
     public void setPlate(String plate) {
         this.plate = plate;
     }
-    @DynamoDBHashKey(attributeName = "transactionStatus")
+
+    @DynamoDBAttribute(attributeName = "transactionStatus")
     @ApiModelProperty(allowableValues = "0, 1")
-    public String getTransactionStatus() {
+    public Integer getTransactionStatus() {
         return transactionStatus;
     }
-    public void setTransactionStatus(String transactionStatus) {
+    public void setTransactionStatus(Integer transactionStatus) {
         this.transactionStatus = transactionStatus;
     }
-    @DynamoDBHashKey(attributeName = "entryDate")
+
+    @DynamoDBAttribute(attributeName = "exitDate")
     public Date getExitDate() {
         return exitDate;
     }
     public void setExitDate(Date exitDate) {
         this.exitDate = exitDate;
     }
-    @DynamoDBHashKey(attributeName = "vehicleType")
+
+    @DynamoDBAttribute(attributeName = "vehicleType")
     public String getVehicleType() {
         return vehicleType;
     }
     public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
-    @DynamoDBHashKey(attributeName = "timeService")
+
+    @DynamoDBAttribute(attributeName = "timeService")
     public String getTimeService() {
         return timeService;
     }
@@ -69,14 +77,16 @@ public class ParkingTransaction extends Model{
         this.timeService = timeService;
     }
 
-    /*public static Vehicle findByTid(String tid) {
-        Map<String, AttributeValue> eav = Collections.singletonMap(":tid", new AttributeValue().withS(tid));
-        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withFilterExpression("dsnro_tag = :tid").withExpressionAttributeValues(eav);
-        List<Vehicle> vehicleList = scan(Vehicle.class, scanExpression);
-        if(vehicleList.isEmpty()) {
+
+    public static ParkingTransaction findByPlateAndStatus(String plate, Integer transactionStatus) {
+        Map<String, AttributeValue> eav = new HashMap<>();
+        eav.put(":plate", new AttributeValue().withS(plate));
+        eav.put(":status", new AttributeValue().withN(transactionStatus.toString()));
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withFilterExpression("plate = :plate AND transactionStatus = :status").withExpressionAttributeValues(eav);
+        List<ParkingTransaction> transactionList = scan(ParkingTransaction.class, scanExpression);
+        if(transactionList.isEmpty()) {
             return null;
         }
-        return vehicleList.get(0);
-    }*/
-
+        return transactionList.get(0);
+    }
 }

@@ -5,7 +5,8 @@ application:
 aws:
   accessKey: AKIAU25556XO3L7TL3VQ
   secretKey: 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
-  arnentryparking: arn:aws:sns:us-east-1:332721419741:dev_parking_flypass
+  arnentryparkingsns: 'arn:aws:sns:us-east-1:332721419741:dev_parking_flypass'
+  arnentryparkingsqs: 'arn:aws:sqs:us-east-1:332721419741:dev_parking_flypass_entry'
 info:
   component: parkingFlypassService
 server:

@@ -79,6 +79,17 @@
 			<artifactId>springfox-boot-starter</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>9.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>guava</groupId>
+					<artifactId>com.google.guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>

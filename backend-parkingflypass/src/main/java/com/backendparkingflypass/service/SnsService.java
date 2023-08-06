@@ -37,12 +37,9 @@ public class SnsService {
     public void sendToSNS(String message, String arnParkingTransaction){
         logger.info("Inicio del envio del mensaje a SNS");
         try{
-            Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
-
             PublishResult result = getAmazonSNS().publish(new PublishRequest()
                     .withTopicArn(arnParkingTransaction)
                     .withMessage(message)
-                    .withMessageAttributes(messageAttributes)
             );
             logger.info("mensaje enviado al SNS con exito id: "+result.getMessageId());
         }catch(Exception e){
