@@ -99,4 +99,15 @@ public class ParkingTransaction extends Model{
         }
         return transactionList.get(0);
     }
+    public static List<ParkingTransaction> findByVehicleTypeAndTransactionStatus(String vehicleType, Integer transactionStatus) {
+        Map<String, AttributeValue> eav = new HashMap<>();
+        eav.put(":vehicleType", new AttributeValue().withS(vehicleType));
+        eav.put(":transactionStatus", new AttributeValue().withN(String.valueOf(transactionStatus)));
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression("vehicleType = :vehicleType AND transactionStatus = :transactionStatus")
+                .withExpressionAttributeValues(eav);
+
+        return scan(ParkingTransaction.class, scanExpression);
+    }
+
 }

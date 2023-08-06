@@ -4,6 +4,7 @@ public class Constants {
     public static final String ROOT_ENDPOINT = "transactions";
     public static final String CREATE_TRANSACTIONS = "create";
     public static final String TERMINATED_TRANSACTIONS = "terminate";
+    public static final String AVERAGE_TRANSACTIONS = "average";
     public static final String TRANSACTIONS_SNS = "dev_parking_flypass";
     public static final String TRANSACTIONS_SQS = "parking_flypass_entry";
 

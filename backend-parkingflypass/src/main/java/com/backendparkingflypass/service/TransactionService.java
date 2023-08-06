@@ -48,7 +48,7 @@ public class TransactionService {
                 RequestTransactionCreateDTO requestTransactionCreate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionCreateDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
 
-                ParkingTransaction parkingTransactionIdValidation = TransactionIdValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class);
+                ParkingTransaction parkingTransactionIdValidation = transactionIdValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class);
                 ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
                 if(parkingTransactionIdValidation == null){
                     if(parkingTransactionValidation == null){
@@ -102,7 +102,7 @@ public class TransactionService {
                 RequestTransactionTerminatedDTO requestTransactionTerminate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionTerminatedDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
 
-                ParkingTransaction parkingTransactionValidation = TransactionIdValidation(requestTransactionTerminate.getTransactionId(), ParkingTransaction.class);
+                ParkingTransaction parkingTransactionValidation = transactionIdValidation(requestTransactionTerminate.getTransactionId(), ParkingTransaction.class);
                 if(parkingTransactionValidation != null){
                     terminateTransaction(parkingTransactionValidation);
                     logger.info("Se finaliza transaccion para la placa: " + parkingTransactionValidation.getPlate() + "con el numero de transacción : " + parkingTransactionValidation.getTransactionId());
@@ -117,7 +117,7 @@ public class TransactionService {
         return messagesToDelete;
     }
 
-    public <T> T TransactionIdValidation(String transactionId,  Class<T> parkingTransactionDTOClass) {
+    public <T> T transactionIdValidation(String transactionId,  Class<T> parkingTransactionDTOClass) {
         logger.info("Consulta de transacccion por id: {}" , transactionId);
         try{
             return Optional.ofNullable(ParkingTransaction.findByTransaction(transactionId)).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
