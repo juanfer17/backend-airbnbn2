@@ -9,8 +9,11 @@ import com.backendparkingflypass.general.exception.NoDataFoundException;
 import com.backendparkingflypass.general.utils.DateTimeUtils;
 import com.backendparkingflypass.general.utils.JSONUtils;
 import com.backendparkingflypass.model.ParkingTransaction;
+import com.backendparkingflypass.repository.ParkingTransactionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,10 +28,15 @@ public class TransactionService {
     private final AwsProperties awsProperties;
     private MessagesService messagesService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    public TransactionService( SnsService snsService, AwsProperties awsProperties, MessagesService messagesService) {
+
+    @Autowired
+    private final ParkingTransactionRepository parkingTransactionRepository;
+
+    public TransactionService( SnsService snsService, AwsProperties awsProperties, MessagesService messagesService, ParkingTransactionRepository parkingTransactionRepository) {
         this.snsService = snsService;
         this.awsProperties = awsProperties;
         this.messagesService = messagesService;
+        this.parkingTransactionRepository = parkingTransactionRepository;
     }
     private static final Logger logger = LogManager.getLogger(TransactionService.class);
 
@@ -69,7 +77,7 @@ public class TransactionService {
     public <T> T transactionValidation(String plate,  Class<T> parkingTransactionDTOClass) {
         logger.info("Consulta de vehiculo por placa: {}" , plate);
         try{
-            return Optional.ofNullable(ParkingTransaction.findByPlateAndStatus(plate, EnumTransactionStatus.STARTED.getId())).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
+            return Optional.ofNullable(parkingTransactionRepository.findByPlateAndStatus(plate, EnumTransactionStatus.STARTED.getId())).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
         }catch(NoDataFoundException noDataFoundException){
             return null;
         }
@@ -86,7 +94,7 @@ public class TransactionService {
         parkingTransaction.save();
     }
 
-    public List<Message> terminateTransactionFromQuee(List<Message> messages) {
+    public List<Message> terminateTransactionFromQeue(List<Message> messages) {
         List<Message> messagesToDelete = new ArrayList<>();
         for (Message message : messages) {
             try {
@@ -118,7 +126,7 @@ public class TransactionService {
     public <T> T transactionIdValidation(String transactionId,  Class<T> parkingTransactionDTOClass) {
         logger.info("Consulta de transacccion por id: {}" , transactionId);
         try{
-            return Optional.ofNullable(ParkingTransaction.findByTransaction(transactionId)).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
+            return Optional.ofNullable(parkingTransactionRepository.findByTransaction(transactionId)).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
         }catch(NoDataFoundException noDataFoundException){
             return null;
         }

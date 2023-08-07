@@ -1,4 +1,4 @@
-package com.backendparkingflypass;
+package com.backendparkingflypass.test;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

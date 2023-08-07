@@ -78,7 +78,7 @@ public class ParkingTransaction extends Model{
     }
 
 
-    public static ParkingTransaction findByPlateAndStatus(String plate, Integer transactionStatus) {
+    /*public static ParkingTransaction findByPlateAndStatus(String plate, Integer transactionStatus) {
         Map<String, AttributeValue> eav = new HashMap<>();
         eav.put(":plate", new AttributeValue().withS(plate));
         eav.put(":status", new AttributeValue().withN(transactionStatus.toString()));
@@ -116,6 +116,6 @@ public class ParkingTransaction extends Model{
                 .withFilterExpression("transactionStatus = :transactionStatus")
                 .withExpressionAttributeValues(eav);
         return scan(ParkingTransaction.class, scanExpression);
-    }
+    }*/
 
 }

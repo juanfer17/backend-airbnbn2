@@ -31,7 +31,7 @@ public class SQSExitScheduled extends TaskSchedule {
 
     protected void processTask() {
         List<Message> messages = sqsService.getMessages(AWSClient.TRANSACTION_EXIT_SQS_URL);
-        List<Message> messagesToDelete = transactionService.terminateTransactionFromQuee(messages);
+        List<Message> messagesToDelete = transactionService.terminateTransactionFromQeue(messages);
         sqsService.deleteMessages(messagesToDelete, AWSClient.TRANSACTION_EXIT_SQS_URL);
     }
 }
