@@ -10,6 +10,7 @@ import com.backendparkingflypass.model.ParkingTransaction;
 import com.backendparkingflypass.repository.ParkingTransactionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class StatisticsParking {
 
     private static final Logger logger = LogManager.getLogger(TransactionService.class);
 
+    @Autowired
     private ParkingTransactionRepository parkingTransactionRepository;
     public StatisticsParking(ParkingTransactionRepository parkingTransactionRepository) {
         this.parkingTransactionRepository = parkingTransactionRepository;

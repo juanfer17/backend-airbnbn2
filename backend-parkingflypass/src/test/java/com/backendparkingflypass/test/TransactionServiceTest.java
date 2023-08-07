@@ -39,8 +39,7 @@ public class TransactionServiceTest {
     private SnsService snsService;
     @Mock
     private MessagesService messagesService;
-    @Mock
-    private ParkingTransaction parkingRepository;
+
     @InjectMocks
     private TransactionService transactionService;
 
