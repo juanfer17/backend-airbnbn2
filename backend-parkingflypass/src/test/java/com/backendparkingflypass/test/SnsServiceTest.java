@@ -67,9 +67,6 @@ public class SnsServiceTest {
 
         snsService.sendToSNS(publishRequest.getMessage(), publishRequest.getTopicArn());
 
-
-
-
     }
 
 }

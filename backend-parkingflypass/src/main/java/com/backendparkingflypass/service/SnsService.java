@@ -17,7 +17,7 @@ import java.util.Map;
 @Service
 public class SnsService {
 
-    private static final Logger logger = LogManager.getLogger(SnsService.class);
+    public static final Logger logger = LogManager.getLogger(SnsService.class);
     private final AWSClient awsClient;
     private AmazonSNS amazonSNS;
     private final AwsProperties awsProperties;
