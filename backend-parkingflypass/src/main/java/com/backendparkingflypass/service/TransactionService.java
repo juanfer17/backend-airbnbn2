@@ -25,13 +25,11 @@ public class TransactionService {
     private final AwsProperties awsProperties;
     private MessagesService messagesService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     public TransactionService( SnsService snsService, AwsProperties awsProperties, MessagesService messagesService) {
         this.snsService = snsService;
         this.awsProperties = awsProperties;
         this.messagesService = messagesService;
     }
-
     private static final Logger logger = LogManager.getLogger(TransactionService.class);
 
     public List<Message> createTransaction(List<Message> messages) {
@@ -49,8 +47,8 @@ public class TransactionService {
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
 
                 ParkingTransaction parkingTransactionIdValidation = transactionIdValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class);
-                ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
                 if(parkingTransactionIdValidation == null){
+                    ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
                     if(parkingTransactionValidation == null){
                         createAndSaveTransaction(requestTransactionCreate);
                         logger.info("Se crea el Transaccion de la placa : " + requestTransactionCreate.getPlate() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());

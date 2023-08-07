@@ -11,9 +11,4 @@ public class DateTimeUtils {
         return new Date(localDate.getTime() - localToUtcDifference);
     }
 
-    // Convierte una fecha UTC a local
-    public static Date convertUTCToLocal(Date utcDate) {
-        long localToUtcDifference = TimeZone.getDefault().getRawOffset();
-        return new Date(utcDate.getTime() + localToUtcDifference);
-    }
 }
