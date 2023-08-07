@@ -72,23 +72,18 @@ public class StatisticsParkingTest {
         parkingTransaction.setVehicleType("CAMION");
         parkingTransaction.setTimeService(10);
         timeServicesByVehicleType.add(parkingTransaction);
-        // Create a mock `ParkingTransaction` object.
-        ParkingTransaction mockTransaction = Mockito.mock(ParkingTransaction.class);
 
-        // Configure the mock `ParkingTransaction` object to return a specific time service.
-        Mockito.when(mockTransaction.getTimeService()).thenReturn(10);
+        // Mock the findByVehicleType method to return the predefined list
+        Mockito.when(statisticsParking.findByVehicleType("CAMION", ParkingTransaction.class)).thenReturn(timeServicesByVehicleType);
 
-
+        // Call the `averageTimeService` method.
         RequestStatisticsParkingDTO requestStatisticsParkingDTO = new RequestStatisticsParkingDTO();
         requestStatisticsParkingDTO.setVehicleType("CAMION");
+        String result = statisticsParking.averageTimeService(requestStatisticsParkingDTO);
 
-        statisticsParking.averageTimeService(requestStatisticsParkingDTO);
-
-        // Call the `getAverageTime()` method.
-        double averageTime = parkingTransaction.getTimeService();
-
-        // Assert that the result is correct.
-        assertEquals(10, averageTime);
+        // Verify the result
+        String expectedMessage = "Tiempo promedio de servicio por tipo de vehículo: CAMION: 10.0 minutos";
+        assertEquals(expectedMessage, result);
     }
 
     @Test
@@ -104,5 +99,32 @@ public class StatisticsParkingTest {
         statisticsParking.maxTimeService();
     }
 
+    @Test
+    public void testAverageTimeService_NoData() {
+        // Mock the findByVehicleType method to return an empty list
+        Mockito.when(statisticsParking.findByVehicleType("CAMION", ParkingTransaction.class)).thenReturn(Collections.emptyList());
+
+        // Call the `averageTimeService` method.
+        RequestStatisticsParkingDTO requestStatisticsParkingDTO = new RequestStatisticsParkingDTO();
+        requestStatisticsParkingDTO.setVehicleType("CAMION");
+        String result = statisticsParking.averageTimeService(requestStatisticsParkingDTO);
+
+        // Verify the result
+        String expectedMessage = "No hay informacion disponible para la consulta de findByVehicleType";
+        assertEquals(expectedMessage, result);
+    }
+
+    @Test
+    public void testMaxTimeService_NoData() {
+        // Mock the findByTransactionStatus method to return an empty list
+        Mockito.when(statisticsParking.findByTransactionStatus(EnumTransactionStatus.TERMINATED.getId(), ParkingTransaction.class)).thenReturn(Collections.emptyList());
+
+        // Call the `maxTimeService` method.
+        String result = statisticsParking.maxTimeService();
+
+        // Verify the result
+        String expectedMessage = "No hay información disponible para la consulta del vehículo que ha permanecido más tiempo en el parqueadero";
+        assertEquals(expectedMessage, result);
+    }
 
 }

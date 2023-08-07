@@ -193,10 +193,41 @@ public class TransactionServiceTest {
         // Configurar el comportamiento simulado del transactionService
         Mockito.when(transactionService.transactionIdValidation("12312", Mockito.any(Class.class))).thenReturn(null);
         //Mockito.when(transactionService.transactionValidation("AMA123", Mockito.any(Class.class))).thenReturn(null);
+        // Configurar el comportamiento simulado del transactionService para el caso del else
+        Mockito.when(transactionService.transactionIdValidation("12312", Mockito.any(Class.class))).thenReturn(new ParkingTransaction());
 
         // Llamar al método bajo prueba
         List<Message> messagesToDelete = transactionService.createTransaction(messages);
 
+    }
+
+    @Test
+    public void testCreateTransactionParkingTransactionId_NotNull() {
+        // Crear mensajes de ejemplo
+        List<Message> messages = new ArrayList<>();
+        String jsonBody = "{\n" +
+                "  \"Type\" : \"Notification\",\n" +
+                "  \"MessageId\" : \"10417b42-302a-59e4-9ec0-26082408f18f\",\n" +
+                "  \"TopicArn\" : \"arn:aws:sns:us-east-1:332721419741:dev_parking_flypass\",\n" +
+                "  \"Message\" : \"{\\\"transactionId\\\":\\\"2222\\\",\\\"plate\\\":\\\"AAA222\\\",\\\"transactionStatus\\\":0,\\\"vehicleType\\\":\\\"AUTOMOVIL\\\"}\",\n" +
+                "  \"Timestamp\" : \"2023-08-06T21:34:26.273Z\",\n" +
+                "  \"SignatureVersion\" : \"1\",\n" +
+                "  \"Signature\" : \"Nv5w1lEzUBIbiEzH0UhAAMh3GUIHSA/toNRY+ZMp+O35uLnopVScsabHPlqbRgtmMDy27btPYcTJ28Jki3/PJwT8LDaTkLn0I5BQemAN7I1gpj8gbm7AMCZpYmf4HnH15TmgrKiAqpufpccIia+n0syOi1oHqvm8LYJJ97qMh0YRMwawlp1JRiCSHbf1tDhAPXNBe1M/76kzbF/y7K5ZBS1rZbu/xMwK+CypLj7NczXd0Q==\",\n" +
+                "  \"SigningCertURL\" : \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem\",\n" +
+                "  \"UnsubscribeURL\" : \"https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:332721419741:dev_parking_flypass:5b2872a2-efb3-413b-a9ef-ecb2946b4e7c\"\n" +
+                "}";
+        Message message1 = new Message();
+        message1.setBody(jsonBody);
+        messages.add(message1);
+        // Configurar el comportamiento simulado del transactionService para el caso del else
+        ParkingTransaction parkingTransaction = new ParkingTransaction();
+        Mockito.when(transactionService.transactionIdValidation("2222", ParkingTransaction.class)).thenReturn(parkingTransaction);
+
+        // Llamar al método bajo prueba
+        List<Message> messagesToDelete = transactionService.createTransaction(messages);
+
+        // Verificar resultados esperados para el caso del else
+        // Aquí puedes realizar las verificaciones necesarias según lo que esperas que suceda cuando el transactionIdValidation devuelve un objeto no nulo
     }
 
     @Test
@@ -233,6 +264,43 @@ public class TransactionServiceTest {
         List<Message> messagesToDelete = transactionService.terminateTransactionFromQeue(messages);
 
     }
+
+
+    @Test
+    public void testTerminateTransactionFromQeueParkingTransaction_Null() {
+        // Crear mensajes de ejemplo
+        List<Message> messages = new ArrayList<>();
+        String jsonBody = "{\n" +
+                "  \"Type\" : \"Notification\",\n" +
+                "  \"MessageId\" : \"e9288cfe-a059-50f4-b89d-d1b5a77a3385\",\n" +
+                "  \"TopicArn\" : \"arn:aws:sns:us-east-1:332721419741:dev_parking_flypass_exit\",\n" +
+                "  \"Message\" : \"{\\\"transactionId\\\":\\\"3333\\\"}\",\n" +
+                "  \"Timestamp\" : \"2023-08-07T14:51:15.582Z\",\n" +
+                "  \"SignatureVersion\" : \"1\",\n" +
+                "  \"Signature\" : \"LQeVWK+GK2ufwsrPysH/+y14DWgzn8gbobQi2QSER5mrmV9ATQJNBkB9JSpQK3e8xonp+gp3GCuywIbk/qEDXOkeUSuWyn/BpqClhNk1O9YcxYAb15dpqSnSgK+vsNI/XgAk0aPloo9sjUkYpR+9QhsfCMeGuW21g4EVhuzWAu+36U6cgVx55p47uFaxI3DFGiti7DYy3b3IGGdAlcdtiw6YegeN5c2+c/O0gi83LtsqJCVZWFEeWcsjxTTYMczIUYVj1R+dkxW/IzbBsPfrT4m+DXn6dAFqrhvnUW1PqAlC0KIhC6dOb8xFPt5s/7dQr2SOVpqHfOshdzexUgMVzA==\",\n" +
+                "  \"SigningCertURL\" : \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem\",\n" +
+                "  \"UnsubscribeURL\" : \"https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:332721419741:dev_parking_flypass_exit:9e02e52c-83db-462a-93e8-83db166ab60c\"\n" +
+                "}";
+        Message message1 = new Message();
+        message1.setBody(jsonBody);
+        messages.add(message1);
+
+        RequestTransactionTerminatedDTO requestTransactionTerminatedDTO = new RequestTransactionTerminatedDTO();
+        requestTransactionTerminatedDTO.setTransactionId("161196");
+
+        ParkingTransaction parkingTransactionValidation = new ParkingTransaction();
+        parkingTransactionValidation.setTransactionId("161196");
+        parkingTransactionValidation.setPlate("ABC123");
+        parkingTransactionValidation.setTransactionStatus(0);
+
+        // Configurar el comportamiento simulado del transactionService
+        Mockito.when(transactionService.transactionIdValidation("161196", Mockito.any(Class.class))).thenReturn(null);
+
+        // Llamar al método bajo prueba
+        List<Message> messagesToDelete = transactionService.terminateTransactionFromQeue(messages);
+
+    }
+
 
 
 
