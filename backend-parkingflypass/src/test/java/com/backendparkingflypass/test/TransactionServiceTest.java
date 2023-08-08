@@ -112,7 +112,7 @@ public class TransactionServiceTest {
 
         // Agregar transacciones a la lista
         RequestTransactionTerminatedDTO transaction1 = new RequestTransactionTerminatedDTO();
-        transaction1.setTransactionId("1231231");
+        transaction1.setPlate("AAA123");
         // Configurar las propiedades de la transacción 1
         transactions.add(transaction1);
 
@@ -232,7 +232,7 @@ public class TransactionServiceTest {
                 "  \"Type\" : \"Notification\",\n" +
                 "  \"MessageId\" : \"e9288cfe-a059-50f4-b89d-d1b5a77a3385\",\n" +
                 "  \"TopicArn\" : \"arn:aws:sns:us-east-1:332721419741:dev_parking_flypass_exit\",\n" +
-                "  \"Message\" : \"{\\\"transactionId\\\":\\\"3333\\\"}\",\n" +
+                "  \"Message\" : \"{\\\"plate\\\":\\\"AAA123\\\"}\",\n" +
                 "  \"Timestamp\" : \"2023-08-07T14:51:15.582Z\",\n" +
                 "  \"SignatureVersion\" : \"1\",\n" +
                 "  \"Signature\" : \"LQeVWK+GK2ufwsrPysH/+y14DWgzn8gbobQi2QSER5mrmV9ATQJNBkB9JSpQK3e8xonp+gp3GCuywIbk/qEDXOkeUSuWyn/BpqClhNk1O9YcxYAb15dpqSnSgK+vsNI/XgAk0aPloo9sjUkYpR+9QhsfCMeGuW21g4EVhuzWAu+36U6cgVx55p47uFaxI3DFGiti7DYy3b3IGGdAlcdtiw6YegeN5c2+c/O0gi83LtsqJCVZWFEeWcsjxTTYMczIUYVj1R+dkxW/IzbBsPfrT4m+DXn6dAFqrhvnUW1PqAlC0KIhC6dOb8xFPt5s/7dQr2SOVpqHfOshdzexUgMVzA==\",\n" +
@@ -244,7 +244,7 @@ public class TransactionServiceTest {
         messages.add(message1);
 
         RequestTransactionTerminatedDTO requestTransactionTerminatedDTO = new RequestTransactionTerminatedDTO();
-        requestTransactionTerminatedDTO.setTransactionId("161196");
+        requestTransactionTerminatedDTO.setPlate("AAA123");
 
         ParkingTransaction parkingTransactionValidation = new ParkingTransaction();
         parkingTransactionValidation.setTransactionId("161196");
@@ -268,7 +268,7 @@ public class TransactionServiceTest {
                 "  \"Type\" : \"Notification\",\n" +
                 "  \"MessageId\" : \"e9288cfe-a059-50f4-b89d-d1b5a77a3385\",\n" +
                 "  \"TopicArn\" : \"arn:aws:sns:us-east-1:332721419741:dev_parking_flypass_exit\",\n" +
-                "  \"Message\" : \"{\\\"transactionId\\\":\\\"3333\\\"}\",\n" +
+                "  \"Message\" : \"{\\\"plate\\\":\\\"AAA123\\\"}\",\n" +
                 "  \"Timestamp\" : \"2023-08-07T14:51:15.582Z\",\n" +
                 "  \"SignatureVersion\" : \"1\",\n" +
                 "  \"Signature\" : \"LQeVWK+GK2ufwsrPysH/+y14DWgzn8gbobQi2QSER5mrmV9ATQJNBkB9JSpQK3e8xonp+gp3GCuywIbk/qEDXOkeUSuWyn/BpqClhNk1O9YcxYAb15dpqSnSgK+vsNI/XgAk0aPloo9sjUkYpR+9QhsfCMeGuW21g4EVhuzWAu+36U6cgVx55p47uFaxI3DFGiti7DYy3b3IGGdAlcdtiw6YegeN5c2+c/O0gi83LtsqJCVZWFEeWcsjxTTYMczIUYVj1R+dkxW/IzbBsPfrT4m+DXn6dAFqrhvnUW1PqAlC0KIhC6dOb8xFPt5s/7dQr2SOVpqHfOshdzexUgMVzA==\",\n" +
@@ -280,7 +280,7 @@ public class TransactionServiceTest {
         messages.add(message1);
 
         RequestTransactionTerminatedDTO requestTransactionTerminatedDTO = new RequestTransactionTerminatedDTO();
-        requestTransactionTerminatedDTO.setTransactionId("161196");
+        requestTransactionTerminatedDTO.setPlate("AAA123");
 
         ParkingTransaction parkingTransactionValidation = new ParkingTransaction();
         parkingTransactionValidation.setTransactionId("161196");

@@ -101,12 +101,12 @@ public class TransactionService {
                 RequestTransactionTerminatedDTO requestTransactionTerminate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionTerminatedDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
 
-                ParkingTransaction parkingTransactionValidation = transactionIdValidation(requestTransactionTerminate.getTransactionId(), ParkingTransaction.class);
+                ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionTerminate.getPlate(), ParkingTransaction.class);
                 if(parkingTransactionValidation != null){
                     terminateTransaction(parkingTransactionValidation);
                     logger.info("Se finaliza transaccion para la placa: " + parkingTransactionValidation.getPlate());
                 } else {
-                    logger.warn("No se encontro una transaccion con el siguiente Id: " + requestTransactionTerminate.getTransactionId());
+                    logger.warn("No se encontro una transaccion con el siguiente Id: " + requestTransactionTerminate.getPlate());
                 }
                 messagesToDelete.add(message);
             } catch (JsonProcessingException | NoSuchElementException | ClassCastException e) {

@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class RequestTransactionTerminatedDTO {
-    private String transactionId;
+    private String plate;
 }
