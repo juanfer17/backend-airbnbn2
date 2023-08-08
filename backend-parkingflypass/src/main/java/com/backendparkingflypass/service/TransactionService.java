@@ -14,10 +14,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -53,7 +55,7 @@ public class TransactionService {
 
                 RequestTransactionCreateDTO requestTransactionCreate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionCreateDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
-                ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
+                ParkingTransaction parkingTransactionValidation = parkingTransactionRepository.findByPlateAndStatus(requestTransactionCreate.getPlate(), EnumTransactionStatus.STARTED.getId());
                 if(parkingTransactionValidation == null){
                     createAndSaveTransaction(requestTransactionCreate);
                     logger.info("Se crea el Transaccion de la placa : " + requestTransactionCreate.getPlate());
@@ -68,13 +70,6 @@ public class TransactionService {
         return messagesToDelete;
     }
 
-    public <T> T transactionValidation(String plate,  Class<T> parkingTransactionDTOClass) { logger.info("Consulta de vehiculo por placa: {}" , plate);
-        try{
-            return Optional.ofNullable(parkingTransactionRepository.findByPlateAndStatus(plate, EnumTransactionStatus.STARTED.getId())).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
-        }catch(NoDataFoundException noDataFoundException){
-            return null;
-        }
-    }
 
     public void createAndSaveTransaction(RequestTransactionCreateDTO requestTransactionCreate){
         ParkingTransaction parkingTransaction = new ParkingTransaction();
@@ -96,33 +91,26 @@ public class TransactionService {
                 JsonNode rootNode = objectMapper.readTree(jsonMessage);
                 String filteredMessage = rootNode.get("Message").asText();
 
-                logger.info("Se obtiene el body del mensaje " + filteredMessage);
+                logger.info("Se obtiene el cuerpo del mensaje " + filteredMessage);
 
                 RequestTransactionTerminatedDTO requestTransactionTerminate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionTerminatedDTO.class))
-                        .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo procesar el mensaje de finalización de transacción."));
 
-                ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionTerminate.getPlate(), ParkingTransaction.class);
-                if(parkingTransactionValidation != null){
+                ParkingTransaction parkingTransactionValidation = parkingTransactionRepository.findByPlateAndStatus(requestTransactionTerminate.getPlate(), EnumTransactionStatus.STARTED.getId());
+                if (parkingTransactionValidation != null) {
                     terminateTransaction(parkingTransactionValidation);
-                    logger.info("Se finaliza transaccion para la placa: " + parkingTransactionValidation.getPlate());
+                    logger.info("Se ha finalizado la transacción para la placa: " + parkingTransactionValidation.getPlate());
                 } else {
-                    logger.warn("No se encontro una transaccion con el siguiente Id: " + requestTransactionTerminate.getPlate());
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró una transacción con el ID de placa proporcionado.");
                 }
                 messagesToDelete.add(message);
-            } catch (JsonProcessingException | NoSuchElementException | ClassCastException e) {
+            } catch (JsonProcessingException | NoSuchElementException | ResponseStatusException e) {
                 logger.error(e.getMessage());
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error al procesar el mensaje de finalización de transacción.", e);
             }
         }
         return messagesToDelete;
-    }
-
-    public <T> T transactionIdValidation(String transactionId,  Class<T> parkingTransactionDTOClass) {
-        logger.info("Consulta de transacccion por id: {}" , transactionId);
-        try{
-            return Optional.ofNullable(parkingTransactionRepository.findByTransaction(transactionId)).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
-        }catch(NoDataFoundException noDataFoundException){
-            return null;
-        }
     }
 
     public void terminateTransaction(ParkingTransaction parkingTransaction){
@@ -137,13 +125,14 @@ public class TransactionService {
         parkingTransaction.save();
     }
 
-    // Envio de información a los Topics
+
     public void sendTransactionToSNS(List<RequestTransactionCreateDTO> transactions) {
         for(RequestTransactionCreateDTO requestTransactionCreate : transactions){
             logger.info("Se envia SNS de creacion de transaccion ");
             sendSNSTransaction(requestTransactionCreate, awsProperties.getArnEntryParkingSns());
         }
     }
+
     public void sendEndTransactionToSNS(List<RequestTransactionTerminatedDTO> transactions) {
         for(RequestTransactionTerminatedDTO requestTransactionTerminated : transactions){
             logger.info("Se envia SNS de creacion de transaccion ");

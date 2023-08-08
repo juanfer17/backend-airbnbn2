@@ -1,5 +1,6 @@
 package com.backendparkingflypass.test;
 
+import com.amazonaws.services.auditmanager.model.AWSService;
 import com.amazonaws.services.sqs.model.Message;
 import com.backendparkingflypass.config.AWSClient;
 import com.backendparkingflypass.config.ApplicationProperties;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +41,8 @@ public class TransactionServiceTest {
     private SnsService snsService;
     @Mock
     private MessagesService messagesService;
+    @Mock
+    private AWSService awsService;
 
     @InjectMocks
     private TransactionService transactionService;
@@ -126,43 +130,6 @@ public class TransactionServiceTest {
         // Verificar que sendSNSTransactionTerminated se llamó para cada transacción en la lista
         verify(snsService, times(transactions.size())).sendToSNS(anyString(), eq("arnExit"));
     }
-    @Test
-    public void testTransactionIdValidation() {
-        // Crear una solicitud de transacción de ejemplo
-        RequestTransactionCreateDTO requestTransactionCreate = new RequestTransactionCreateDTO();
-        requestTransactionCreate.setPlate("LMA530");
-        requestTransactionCreate.setVehicleType("CAMION");
-        try {
-            ApplicationProperties applicationProperties = new ApplicationProperties();
-            AwsProperties awsProperties = new AwsProperties();
-            awsProperties.setAccessKey("DSADSA15DSA15D6SA");
-            awsProperties.setSecretKey("DAS/QiLvuCx8tzmzhhNcS6yoC2JaZ4Xu");
-            AWSClient awsClient = new AWSClient(applicationProperties, awsProperties);
-            DynamoClient dynamoClient = new DynamoClient(applicationProperties, awsClient);
-            assertNull(transactionService.transactionIdValidation("1312", ParkingTransaction.class));
-        } catch (Exception e) {
-            assertThrows(Exception.class, () -> Optional.ofNullable(transactionService).orElseThrow(Exception::new).transactionValidation("123123", ParkingTransaction.class));
-        }
-    }
-
-    @Test
-    public void testTransactionValidation() {
-        // Crear una solicitud de transacción de ejemplo
-        RequestTransactionCreateDTO requestTransactionCreate = new RequestTransactionCreateDTO();
-        requestTransactionCreate.setPlate("LMA530");
-        requestTransactionCreate.setVehicleType("CAMION");
-        try{
-            ApplicationProperties applicationProperties = new ApplicationProperties();
-            AwsProperties awsProperties = new AwsProperties();
-            awsProperties.setAccessKey("DSADSA15DSA15D6SA");
-            awsProperties.setSecretKey("DAS/QiLvuCx8tzmzhhNcS6yoC2JaZ4Xu");
-            AWSClient awsClient = new AWSClient(applicationProperties , awsProperties);
-            DynamoClient dynamoClient = new DynamoClient(applicationProperties,awsClient);
-            assertNull(transactionService.transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class));
-        }catch (Exception e){
-            assertThrows(Exception.class, () -> Optional.ofNullable(transactionService).orElseThrow(Exception::new).transactionValidation("123123", ParkingTransaction.class));
-        }
-    }
 
     @Test
     public void testCreateTransaction() {
@@ -183,11 +150,9 @@ public class TransactionServiceTest {
         message1.setBody(jsonBody);
         messages.add(message1);
 
-        // Crear un objeto mock de TransactionService
-        TransactionService transactionServiceMock = Mockito.mock(TransactionService.class);
-
+        ParkingTransaction parkingTransaction = new ParkingTransaction();
         // Configurar el comportamiento simulado del transactionService
-        Mockito.when(transactionServiceMock.transactionValidation(Mockito.eq("ASD123"), Mockito.any(Class.class))).thenReturn(null);
+        Mockito.when(parkingTransactionRepository.findByPlateAndStatus(any(),any())).thenReturn(parkingTransaction);
 
 
         // Llamar al método bajo prueba
@@ -215,7 +180,8 @@ public class TransactionServiceTest {
         messages.add(message1);
         // Configurar el comportamiento simulado del transactionService para el caso del else
         ParkingTransaction parkingTransaction = new ParkingTransaction();
-        Mockito.when(transactionService.transactionIdValidation("2222", ParkingTransaction.class)).thenReturn(parkingTransaction);
+        parkingTransaction.setTransactionId("123");
+        Mockito.when(parkingTransactionRepository.findByPlateAndStatus(any(),any())).thenReturn(parkingTransaction);
 
         // Llamar al método bajo prueba
         List<Message> messagesToDelete = transactionService.createTransaction(messages);
@@ -250,9 +216,10 @@ public class TransactionServiceTest {
         parkingTransactionValidation.setTransactionId("161196");
         parkingTransactionValidation.setPlate("ABC123");
         parkingTransactionValidation.setTransactionStatus(0);
+        parkingTransactionValidation.setEntryDate(new Date());
 
         // Configurar el comportamiento simulado del transactionService
-        Mockito.when(transactionService.transactionIdValidation("161196", Mockito.any(Class.class))).thenReturn(parkingTransactionValidation);
+        Mockito.when(parkingTransactionRepository.findByPlateAndStatus(any(),any())).thenReturn(parkingTransactionValidation);
 
         // Llamar al método bajo prueba
         List<Message> messagesToDelete = transactionService.terminateTransactionFromQeue(messages);
@@ -288,14 +255,11 @@ public class TransactionServiceTest {
         parkingTransactionValidation.setTransactionStatus(0);
 
         // Configurar el comportamiento simulado del transactionService
-        Mockito.when(transactionService.transactionIdValidation("161196", Mockito.any(Class.class))).thenReturn(null);
+        Mockito.when(parkingTransactionRepository.findByPlateAndStatus(any(),any())).thenReturn(null);
 
         // Llamar al método bajo prueba
         List<Message> messagesToDelete = transactionService.terminateTransactionFromQeue(messages);
 
     }
-
-
-
 
 }
