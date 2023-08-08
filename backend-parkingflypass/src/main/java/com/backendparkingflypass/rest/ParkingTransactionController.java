@@ -4,6 +4,7 @@ import com.backendparkingflypass.dto.RequestStatisticsParkingDTO;
 import com.backendparkingflypass.dto.RequestTransactionCreateDTO;
 import com.backendparkingflypass.dto.RequestTransactionTerminatedDTO;
 import com.backendparkingflypass.general.constansts.Constants;
+import com.backendparkingflypass.general.utils.ResponseObject;
 import com.backendparkingflypass.service.StatisticsParking;
 import com.backendparkingflypass.service.TransactionService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,22 +51,26 @@ public class ParkingTransactionController {
     }
 
     @PostMapping(Constants.AVERAGE_TRANSACTIONS)
-    public ResponseEntity<String> averageTransactions(@RequestBody RequestStatisticsParkingDTO requestStatisticsParkingDTO) {
+    public ResponseEntity<ResponseObject> averageTransactions(@RequestBody RequestStatisticsParkingDTO requestStatisticsParkingDTO) {
         try {
             String result = statisticsParking.averageTimeService(requestStatisticsParkingDTO);
-            return ResponseEntity.ok(result);
+            ResponseObject responseObject = new ResponseObject(true, "Success", result);
+            return ResponseEntity.ok(responseObject);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fallo al calcular el promedio.", e);
+            ResponseObject errorResponse = new ResponseObject(false, "Error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     @PostMapping(Constants.MAX_SERVICE_TIME)
-    public ResponseEntity<String> maxTimeService() {
+    public ResponseEntity<ResponseObject> maxTimeService() {
         try {
             String result = statisticsParking.maxTimeService();
-            return ResponseEntity.ok(result);
+            ResponseObject responseObject = new ResponseObject(true, "Success", result);
+            return ResponseEntity.ok(responseObject);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fallo al consultar el tiempo máximo", e);
+            ResponseObject errorResponse = new ResponseObject(false, "Error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 

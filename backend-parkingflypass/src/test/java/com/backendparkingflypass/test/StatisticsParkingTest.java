@@ -81,7 +81,7 @@ public class StatisticsParkingTest {
         String result = statisticsParking.averageTimeService(requestStatisticsParkingDTO);
 
         // Verify the result
-        String expectedMessage = "Tiempo promedio de servicio por tipo de vehículo: CAMION: 10.0 minutos";
+        String expectedMessage = "Tiempo promedio de servicio por tipo de vehículo: CAMION: 10 minutos";
         assertEquals(expectedMessage, result);
     }
 

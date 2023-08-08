@@ -38,12 +38,12 @@ public class StatisticsParking {
             return "No hay informacion disponible para la consulta de findByVehicleType";
         }
 
-        double sumTime = 0.0;
+        Integer sumTime = 0;
         for (ParkingTransaction transaction : timeServicesByVehicleType) {
             sumTime += transaction.getTimeService(); // Ajusta el nombre del método según tu clase ParkingTransaction
         }
 
-        double averageTime = sumTime / timeServicesByVehicleType.size();
+        Integer averageTime = sumTime / timeServicesByVehicleType.size();
 
         return "Tiempo promedio de servicio por tipo de vehículo: " + requestStatisticsParkingDTO.getVehicleType() + ": " + averageTime + " minutos";
     }
