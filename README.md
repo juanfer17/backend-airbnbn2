@@ -17,3 +17,4 @@ maxTimeService: Consulta y devuelve el tiempo máximo de servicio registrado par
 Pruebas Unitarias
 Ejecuta npm test para ejecutar las pruebas unitarias utilizando Jasmine.
 
+Colection de Postman: https://www.postman.com/cryosat-participant-586089/workspace/parkingflypass
