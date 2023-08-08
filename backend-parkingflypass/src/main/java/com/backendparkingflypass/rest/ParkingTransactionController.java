@@ -8,10 +8,13 @@ import com.backendparkingflypass.service.StatisticsParking;
 import com.backendparkingflypass.service.TransactionService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -26,24 +29,44 @@ public class ParkingTransactionController {
     @Autowired
     private StatisticsParking statisticsParking;
 
-    @PostMapping( value = Constants.CREATE_TRANSACTIONS)
-    public void createTransaction(@RequestBody List<RequestTransactionCreateDTO> requestTransactionCreate, @ApiIgnore HttpServletResponse response){
-        transactionService.sendTransactionToSNS(requestTransactionCreate);
-        response.setStatus(HttpServletResponse.SC_CREATED);
-    }
-    @PostMapping( value = Constants.TERMINATED_TRANSACTIONS)
-    public void endTransaction(@RequestBody List<RequestTransactionTerminatedDTO> requestTransactionTerminated, @ApiIgnore HttpServletResponse response){
-        transactionService.sendEndTransactionToSNS(requestTransactionTerminated);
-        response.setStatus(HttpServletResponse.SC_CREATED);
-    }
-    @PostMapping( value = Constants.AVERAGE_TRANSACTIONS)
-    public String averageTransactions(@RequestBody RequestStatisticsParkingDTO requestStatisticsParkingDTO, @ApiIgnore HttpServletResponse response){
-        return statisticsParking.averageTimeService(requestStatisticsParkingDTO);
+    @PostMapping(Constants.CREATE_TRANSACTIONS)
+    public ResponseEntity<String> createTransaction(@RequestBody List<RequestTransactionCreateDTO> requestTransactionCreate) {
+        try {
+            transactionService.sendTransactionToSNS(requestTransactionCreate);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Transacion creada exitosamente.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fallo al crear transaccion.", e);
+        }
     }
 
-    @PostMapping( value = Constants.MAX_SERVICE_TIME)
-    public String maxTimeService(@ApiIgnore HttpServletResponse response){
-        return statisticsParking.maxTimeService();
+    @PostMapping(Constants.TERMINATED_TRANSACTIONS)
+    public ResponseEntity<String> endTransaction(@RequestBody List<RequestTransactionTerminatedDTO> requestTransactionTerminated) {
+        try {
+            transactionService.sendEndTransactionToSNS(requestTransactionTerminated);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Transacion finalizada exitosamente.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fallo al finalizar transaccion.", e);
+        }
+    }
+
+    @PostMapping(Constants.AVERAGE_TRANSACTIONS)
+    public ResponseEntity<String> averageTransactions(@RequestBody RequestStatisticsParkingDTO requestStatisticsParkingDTO) {
+        try {
+            String result = statisticsParking.averageTimeService(requestStatisticsParkingDTO);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fallo al calcular el promedio.", e);
+        }
+    }
+
+    @PostMapping(Constants.MAX_SERVICE_TIME)
+    public ResponseEntity<String> maxTimeService() {
+        try {
+            String result = statisticsParking.maxTimeService();
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Fallo al consultar el tiempo máximo", e);
+        }
     }
 
 }
