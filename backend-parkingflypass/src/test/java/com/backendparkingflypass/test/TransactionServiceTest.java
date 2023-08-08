@@ -56,7 +56,6 @@ public class TransactionServiceTest {
     public void testCreateAndSaveTransaction() {
         // Crear un mock de RequestTransactionCreateDTO
         RequestTransactionCreateDTO mockRequest = mock(RequestTransactionCreateDTO.class);
-        when(mockRequest.getTransactionId()).thenReturn("transactionId");
         when(mockRequest.getPlate()).thenReturn("ABC123");
         when(mockRequest.getVehicleType()).thenReturn("car");
 
@@ -92,8 +91,6 @@ public class TransactionServiceTest {
         List<RequestTransactionCreateDTO> transactions = new ArrayList<>();
         // Agregar transacciones a la lista
         RequestTransactionCreateDTO transaction1 = new RequestTransactionCreateDTO();
-        transaction1.setTransactionId("1231231");
-        transaction1.setTransactionId("0");
         transaction1.setPlate("ABC123");
         // Configurar las propiedades de la transacción 1
         transactions.add(transaction1);
@@ -133,8 +130,6 @@ public class TransactionServiceTest {
     public void testTransactionIdValidation() {
         // Crear una solicitud de transacción de ejemplo
         RequestTransactionCreateDTO requestTransactionCreate = new RequestTransactionCreateDTO();
-        requestTransactionCreate.setTransactionId("123123");
-        requestTransactionCreate.setTransactionStatus(EnumTransactionStatus.STARTED.getId());
         requestTransactionCreate.setPlate("LMA530");
         requestTransactionCreate.setVehicleType("CAMION");
         try {
@@ -144,9 +139,9 @@ public class TransactionServiceTest {
             awsProperties.setSecretKey("DAS/QiLvuCx8tzmzhhNcS6yoC2JaZ4Xu");
             AWSClient awsClient = new AWSClient(applicationProperties, awsProperties);
             DynamoClient dynamoClient = new DynamoClient(applicationProperties, awsClient);
-            assertNull(transactionService.transactionIdValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class));
+            assertNull(transactionService.transactionIdValidation("1312", ParkingTransaction.class));
         } catch (Exception e) {
-            assertThrows(Exception.class, () -> Optional.ofNullable(transactionService).orElseThrow(Exception::new).transactionValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class));
+            assertThrows(Exception.class, () -> Optional.ofNullable(transactionService).orElseThrow(Exception::new).transactionValidation("123123", ParkingTransaction.class));
         }
     }
 
@@ -154,8 +149,6 @@ public class TransactionServiceTest {
     public void testTransactionValidation() {
         // Crear una solicitud de transacción de ejemplo
         RequestTransactionCreateDTO requestTransactionCreate = new RequestTransactionCreateDTO();
-        requestTransactionCreate.setTransactionId("123123");
-        requestTransactionCreate.setTransactionStatus(EnumTransactionStatus.STARTED.getId());
         requestTransactionCreate.setPlate("LMA530");
         requestTransactionCreate.setVehicleType("CAMION");
         try{
@@ -167,7 +160,7 @@ public class TransactionServiceTest {
             DynamoClient dynamoClient = new DynamoClient(applicationProperties,awsClient);
             assertNull(transactionService.transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class));
         }catch (Exception e){
-            assertThrows(Exception.class, () -> Optional.ofNullable(transactionService).orElseThrow(Exception::new).transactionValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class));
+            assertThrows(Exception.class, () -> Optional.ofNullable(transactionService).orElseThrow(Exception::new).transactionValidation("123123", ParkingTransaction.class));
         }
     }
 
@@ -179,7 +172,7 @@ public class TransactionServiceTest {
                 "  \"Type\" : \"Notification\",\n" +
                 "  \"MessageId\" : \"10417b42-302a-59e4-9ec0-26082408f18f\",\n" +
                 "  \"TopicArn\" : \"arn:aws:sns:us-east-1:332721419741:dev_parking_flypass\",\n" +
-                "  \"Message\" : \"{\\\"transactionId\\\":\\\"2222\\\",\\\"plate\\\":\\\"AAA222\\\",\\\"transactionStatus\\\":0,\\\"vehicleType\\\":\\\"AUTOMOVIL\\\"}\",\n" +
+                "  \"Message\" : \"{\\\"plate\\\":\\\"AAA222\\\",\\\"vehicleType\\\":\\\"AUTOMOVIL\\\"}\",\n" +
                 "  \"Timestamp\" : \"2023-08-06T21:34:26.273Z\",\n" +
                 "  \"SignatureVersion\" : \"1\",\n" +
                 "  \"Signature\" : \"Nv5w1lEzUBIbiEzH0UhAAMh3GUIHSA/toNRY+ZMp+O35uLnopVScsabHPlqbRgtmMDy27btPYcTJ28Jki3/PJwT8LDaTkLn0I5BQemAN7I1gpj8gbm7AMCZpYmf4HnH15TmgrKiAqpufpccIia+n0syOi1oHqvm8LYJJ97qMh0YRMwawlp1JRiCSHbf1tDhAPXNBe1M/76kzbF/y7K5ZBS1rZbu/xMwK+CypLj7NczXd0Q==\",\n" +
@@ -190,11 +183,12 @@ public class TransactionServiceTest {
         message1.setBody(jsonBody);
         messages.add(message1);
 
+        // Crear un objeto mock de TransactionService
+        TransactionService transactionServiceMock = Mockito.mock(TransactionService.class);
+
         // Configurar el comportamiento simulado del transactionService
-        Mockito.when(transactionService.transactionIdValidation("12312", Mockito.any(Class.class))).thenReturn(null);
-        //Mockito.when(transactionService.transactionValidation("AMA123", Mockito.any(Class.class))).thenReturn(null);
-        // Configurar el comportamiento simulado del transactionService para el caso del else
-        Mockito.when(transactionService.transactionIdValidation("12312", Mockito.any(Class.class))).thenReturn(new ParkingTransaction());
+        Mockito.when(transactionServiceMock.transactionValidation(Mockito.eq("ASD123"), Mockito.any(Class.class))).thenReturn(null);
+
 
         // Llamar al método bajo prueba
         List<Message> messagesToDelete = transactionService.createTransaction(messages);
@@ -209,7 +203,7 @@ public class TransactionServiceTest {
                 "  \"Type\" : \"Notification\",\n" +
                 "  \"MessageId\" : \"10417b42-302a-59e4-9ec0-26082408f18f\",\n" +
                 "  \"TopicArn\" : \"arn:aws:sns:us-east-1:332721419741:dev_parking_flypass\",\n" +
-                "  \"Message\" : \"{\\\"transactionId\\\":\\\"2222\\\",\\\"plate\\\":\\\"AAA222\\\",\\\"transactionStatus\\\":0,\\\"vehicleType\\\":\\\"AUTOMOVIL\\\"}\",\n" +
+                "  \"Message\" : \"{\\\"transactionId\\\":\\\"2222\\\",\\\"plate\\\":\\\"AAA222\\\",\\\"vehicleType\\\":\\\"AUTOMOVIL\\\"}\",\n" +
                 "  \"Timestamp\" : \"2023-08-06T21:34:26.273Z\",\n" +
                 "  \"SignatureVersion\" : \"1\",\n" +
                 "  \"Signature\" : \"Nv5w1lEzUBIbiEzH0UhAAMh3GUIHSA/toNRY+ZMp+O35uLnopVScsabHPlqbRgtmMDy27btPYcTJ28Jki3/PJwT8LDaTkLn0I5BQemAN7I1gpj8gbm7AMCZpYmf4HnH15TmgrKiAqpufpccIia+n0syOi1oHqvm8LYJJ97qMh0YRMwawlp1JRiCSHbf1tDhAPXNBe1M/76kzbF/y7K5ZBS1rZbu/xMwK+CypLj7NczXd0Q==\",\n" +

@@ -53,18 +53,12 @@ public class TransactionService {
 
                 RequestTransactionCreateDTO requestTransactionCreate = Optional.ofNullable(JSONUtils.jsonToObject(filteredMessage, RequestTransactionCreateDTO.class))
                         .orElseThrow(() -> new ClassCastException(messagesService.getCannotCastMessage()));
-
-                ParkingTransaction parkingTransactionIdValidation = transactionIdValidation(requestTransactionCreate.getTransactionId(), ParkingTransaction.class);
-                if(parkingTransactionIdValidation == null){
-                    ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
-                    if(parkingTransactionValidation == null){
-                        createAndSaveTransaction(requestTransactionCreate);
-                        logger.info("Se crea el Transaccion de la placa : " + requestTransactionCreate.getPlate() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());
-                    } else {
-                        logger.warn("No se ha guardado el registro debido a que ya existe una transacción para la placa : " + requestTransactionCreate.getPlate()  + " que se encuentra en estado : " + requestTransactionCreate.getTransactionStatus() + "con el numero de transacción : " + requestTransactionCreate.getTransactionId());
-                    }
-                }else{
-                    logger.warn("No se ha guardado el registro debido a que ya existe la transacción : " + requestTransactionCreate.getTransactionId());
+                ParkingTransaction parkingTransactionValidation = transactionValidation(requestTransactionCreate.getPlate(), ParkingTransaction.class);
+                if(parkingTransactionValidation == null){
+                    createAndSaveTransaction(requestTransactionCreate);
+                    logger.info("Se crea el Transaccion de la placa : " + requestTransactionCreate.getPlate());
+                } else {
+                    logger.warn("No se ha guardado el registro debido a que ya existe una transacción para la placa : " + requestTransactionCreate.getPlate()  + " que se encuentra en estado : " + parkingTransactionValidation.getTransactionStatus() + "con el numero de transacción : " + parkingTransactionValidation.getTransactionId());
                 }
                 messagesToDelete.add(message);
             } catch (JsonProcessingException | NoSuchElementException | ClassCastException e) {
@@ -74,8 +68,7 @@ public class TransactionService {
         return messagesToDelete;
     }
 
-    public <T> T transactionValidation(String plate,  Class<T> parkingTransactionDTOClass) {
-        logger.info("Consulta de vehiculo por placa: {}" , plate);
+    public <T> T transactionValidation(String plate,  Class<T> parkingTransactionDTOClass) { logger.info("Consulta de vehiculo por placa: {}" , plate);
         try{
             return Optional.ofNullable(parkingTransactionRepository.findByPlateAndStatus(plate, EnumTransactionStatus.STARTED.getId())).map(v -> v.getDTO(parkingTransactionDTOClass)).orElseThrow(NoDataFoundException::new);
         }catch(NoDataFoundException noDataFoundException){
@@ -85,7 +78,7 @@ public class TransactionService {
 
     public void createAndSaveTransaction(RequestTransactionCreateDTO requestTransactionCreate){
         ParkingTransaction parkingTransaction = new ParkingTransaction();
-        parkingTransaction.setTransactionId(requestTransactionCreate.getTransactionId());
+        parkingTransaction.setTransactionId(parkingTransactionRepository.getNextTransactionId());
         Date entryDate = DateTimeUtils.convertLocalToUTC(new Date());
         parkingTransaction.setEntryDate(entryDate);
         parkingTransaction.setPlate(requestTransactionCreate.getPlate());
@@ -111,7 +104,7 @@ public class TransactionService {
                 ParkingTransaction parkingTransactionValidation = transactionIdValidation(requestTransactionTerminate.getTransactionId(), ParkingTransaction.class);
                 if(parkingTransactionValidation != null){
                     terminateTransaction(parkingTransactionValidation);
-                    logger.info("Se finaliza transaccion para la placa: " + parkingTransactionValidation.getPlate() + "con el numero de transacción : " + parkingTransactionValidation.getTransactionId());
+                    logger.info("Se finaliza transaccion para la placa: " + parkingTransactionValidation.getPlate());
                 } else {
                     logger.warn("No se encontro una transaccion con el siguiente Id: " + requestTransactionTerminate.getTransactionId());
                 }

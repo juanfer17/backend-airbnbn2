@@ -1,10 +1,19 @@
 package com.backendparkingflypass.repository;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
+import com.amazonaws.services.dynamodbv2.model.Select;
 import com.backendparkingflypass.config.DynamoClient;
 import com.backendparkingflypass.model.ParkingTransaction;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -76,4 +85,21 @@ public class ParkingTransactionRepository {
 
         return dynamoDBMapper.scan(ParkingTransaction.class, scanExpression);
     }
+
+    public String getNextTransactionId() {
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+        List<ParkingTransaction> transactions = dynamoDBMapper.scan(ParkingTransaction.class, scanExpression);
+
+        if (transactions.isEmpty()) {
+            return "1";
+        }
+
+        Integer maxTransactionId = transactions.stream()
+                .map(transaction -> Integer.parseInt(transaction.getTransactionId()))
+                .max(Integer::compareTo)
+                .orElse(0);
+
+        return String.valueOf(maxTransactionId + 1);
+    }
+
 }

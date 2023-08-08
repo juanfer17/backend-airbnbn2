@@ -37,12 +37,12 @@ public class ParkingTransactionController {
         response.setStatus(HttpServletResponse.SC_CREATED);
     }
     @PostMapping( value = Constants.AVERAGE_TRANSACTIONS)
-    public String endTransaction(@RequestBody RequestStatisticsParkingDTO requestStatisticsParkingDTO, @ApiIgnore HttpServletResponse response){
+    public String averageTransactions(@RequestBody RequestStatisticsParkingDTO requestStatisticsParkingDTO, @ApiIgnore HttpServletResponse response){
         return statisticsParking.averageTimeService(requestStatisticsParkingDTO);
     }
 
     @PostMapping( value = Constants.MAX_SERVICE_TIME)
-    public String endTransaction(@ApiIgnore HttpServletResponse response){
+    public String maxTimeService(@ApiIgnore HttpServletResponse response){
         return statisticsParking.maxTimeService();
     }
 

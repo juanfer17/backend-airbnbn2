@@ -68,7 +68,6 @@ public class StatisticsParkingTest {
     public void testAverageTimeService() {
         List<ParkingTransaction> timeServicesByVehicleType = new ArrayList<>();
         ParkingTransaction parkingTransaction = new ParkingTransaction();
-        parkingTransaction.setTransactionId("123123");
         parkingTransaction.setVehicleType("CAMION");
         parkingTransaction.setTimeService(10);
         timeServicesByVehicleType.add(parkingTransaction);
@@ -90,7 +89,6 @@ public class StatisticsParkingTest {
     public void testMaxTimeService() {
         List<ParkingTransaction> timeServicesByTransactionStatus = new ArrayList<>();
         ParkingTransaction parkingTransaction = new ParkingTransaction();
-        parkingTransaction.setTransactionId("123123");
         parkingTransaction.setVehicleType("CAMION");
         parkingTransaction.setTimeService(3);
         timeServicesByTransactionStatus.add(parkingTransaction);
